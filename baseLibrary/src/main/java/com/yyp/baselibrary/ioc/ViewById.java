@@ -1,4 +1,4 @@
-package com.yyp.baselibrary;
+package com.yyp.baselibrary.ioc;
 
 /**
  * Created by yangyoupeng on 2017/3/16.

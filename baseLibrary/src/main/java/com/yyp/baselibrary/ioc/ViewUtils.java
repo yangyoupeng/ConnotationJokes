@@ -1,7 +1,11 @@
-package com.yyp.baselibrary;
+package com.yyp.baselibrary.ioc;
 
 import android.app.Activity;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.view.View;
+import android.widget.Toast;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -81,14 +85,21 @@ public class ViewUtils {
         for (Method declaredMethod : declaredMethods) {
             // 2. 找到当前方法view的id 值
             OnClick annotation = declaredMethod.getAnnotation (OnClick.class);
+            
             // 3.不等于null 获取id值，传入帮助类viewfield方法中findViewById
             if (annotation != null) {
                 int[] value = annotation.value ();
                 for (int i : value) {
                     View viewById = viewField.findViewById (i);
-                    // 4.设置setOnClickListener
-                    viewById.setOnClickListener (new DeclaredOnClickListener (declaredMethod,
-                            object));
+                    
+                    //扩展判断是否有网络，
+                    boolean isCheckNet = declaredMethod.getAnnotation (Network.class) != null;
+                    
+                    if (viewById != null) {
+                        // 4.设置setOnClickListener
+                        viewById.setOnClickListener (new DeclaredOnClickListener (declaredMethod,
+                                object, isCheckNet));
+                    }
                 }
             }
         }
@@ -97,14 +108,25 @@ public class ViewUtils {
     public static class DeclaredOnClickListener implements View.OnClickListener {
         private Method method;
         private Object mObject;
+        private boolean mIsCheckNet;
         
-        public DeclaredOnClickListener(Method declaredMethods, Object object) {
+        public DeclaredOnClickListener(Method declaredMethods, Object object, boolean isCheckNet) {
             this.method = declaredMethods;
             this.mObject = object;
+            this.mIsCheckNet = isCheckNet;
         }
         
         @Override
         public void onClick(View v) {
+            //需要不需要判断网络
+            if (mIsCheckNet) {
+                //如果网络没连接，弹出一个吐丝
+                if (!nextworkAvailablt (v.getContext ())) {
+                    Toast.makeText (v.getContext (), "SB，没网了，还点个屁啊", Toast.LENGTH_SHORT).show ();
+                    return;
+                }
+            }
+            
             //可以获取所有方法
             method.setAccessible (true);
             try {
@@ -121,5 +143,22 @@ public class ViewUtils {
                 }
             }
         }
+    }
+    
+    /**
+     * 判断当前网络是否可用
+     */
+    private static boolean nextworkAvailablt(Context context) {
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager) context
+                    .getSystemService (Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo ();
+            if (activeNetworkInfo != null && activeNetworkInfo.isConnected ()) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace ();
+        }
+        return false;
     }
 }

@@ -1,4 +1,4 @@
-package com.yyp.baselibrary;
+package com.yyp.baselibrary.ioc;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface OnClick {
-    int[] value();
+public @interface Network {
     
+//    int[] value();
 }
