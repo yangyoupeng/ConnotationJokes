@@ -135,7 +135,7 @@ public class ViewUtils {
             } catch (Exception e) {
                 e.printStackTrace ();
                 try {
-                    method.invoke (mObject, new Object[]{});
+                    method.invoke (mObject,new Object ());
                 } catch (IllegalAccessException e1) {
                     e1.printStackTrace ();
                 } catch (InvocationTargetException e1) {
