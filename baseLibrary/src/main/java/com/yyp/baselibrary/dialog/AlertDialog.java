@@ -4,7 +4,11 @@ import android.app.Dialog;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.StyleRes;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+
+import com.yyp.baselibrary.R;
 
 /**
  * Created by yangyoupeng on 2017/3/21.
@@ -18,54 +22,48 @@ public class AlertDialog extends Dialog {
     
     public AlertDialog(@NonNull Context context, @StyleRes int themeResId) {
         super (context, themeResId);
-        
         mAlert = new AlertController (this, getWindow ());
     }
     
-    public static class Builder {
-        
-        private AlertController.AlertParams params;
-        
+    /**
+     * 设置点击事件
+     */
+    public void setOnClickListener(int viewId, View.OnClickListener listener) {
+        mAlert.setOnClickListener (viewId,listener);
+    }
+    /**
+     * 设置字体文本
+     */
+    public void setText(int viewId, CharSequence charSequence) {
+        mAlert.setText (viewId,charSequence);
+    }
+    /**获取view*/
+    public < T extends View > T getView(int viewId) {
+        return mAlert.getView (viewId);
+    }
+    public  static class Builder {
+        private final AlertController.AlertParams params;
         
         public Builder(Context context) {
-            this (context, 0);
+            this (context, R.style.dialog);
         }
         
         public Builder(Context context, int themeResId) {
-            params = new AlertController.AlertParams ();
-            params.mThemeResId = themeResId;
-            params.mContext = context;
+            params = new AlertController.AlertParams (context, themeResId);
         }
-        
-              
-        /**
-         */
-        public AlertDialog create() {
-            // Context has already been wrapped with the appropriate theme.
-            final AlertDialog dialog = new AlertDialog (params.mContext, params.mThemeResId);
-            params.apply (dialog.mAlert);
-            dialog.setCancelable (params.mCancelable);
-            if (params.mCancelable) {
-                dialog.setCanceledOnTouchOutside (true);
-            }
-            dialog.setOnCancelListener (params.mOnCancelListener);
-            dialog.setOnDismissListener (params.mOnDismissListener);
-            if (params.mOnKeyListener != null) {
-                dialog.setOnKeyListener (params.mOnKeyListener);
-            }
-            return dialog;
-        }
-        
         
         /**
+         * 设置一些万能的参数
          */
-        public AlertDialog show() {
-            final AlertDialog dialog = create ();
-            dialog.show ();
-            return dialog;
+        public Builder setFullWidth() {
+            params.mWidth = ViewGroup.LayoutParams.MATCH_PARENT;
+            return this;
         }
         
-        public Builder setContentView(View view) {
+        /**
+         * 设置view
+         */
+        public Builder setLayoutView(View view) {
             params.mView = view;
             params.mViewLayoutResId = 0;
             return this;
@@ -74,10 +72,11 @@ public class AlertDialog extends Dialog {
         /**
          * 设置布局内容的layoutId
          */
-        public Builder setContentView(int layoutId) {
+        public Builder setLayoutView(int layoutId) {
             params.mView = null;
             params.mViewLayoutResId = layoutId;
             return this;
+            
         }
         
         /**
@@ -95,6 +94,45 @@ public class AlertDialog extends Dialog {
             params.mOnClickListenerArray.put (view, listener);
             return this;
         }
+        
+        /**
+         * 设置宽度和高度
+         */
+        public Builder setWidthAddHeight(int width, int height) {
+            params.mWidth = width;
+            params.mHeight = height;
+            return this;
+        }
+        
+        /**
+         * 设置动画
+         */
+        public Builder setAnimation(int styleAnimation) {
+            params.mAnimation = styleAnimation;
+            return this;
+        }
+        
+        /**
+         * 设置默认的动画
+         */
+        public Builder setDefultAnimation() {
+            params.mAnimation = R.style.dialog_scale_anim;
+            return this;
+        }
+        
+        /**
+         * 设置是否有动画，从底部弹出来
+         */
+        public Builder setFormBottom(boolean isAnimation) {
+            if (isAnimation) {
+                //从底部弹出的动画
+                params.mAnimation = R.style.dialog_from_bottom_anim;
+            }
+            //            设置动画的位置在底部
+            params.mGravity = Gravity.BOTTOM;
+            return this;
+        }
+        
         
         public Builder setCancelable(boolean cancelable) {
             params.mCancelable = cancelable;
@@ -114,6 +152,28 @@ public class AlertDialog extends Dialog {
         public Builder setOnKeyListener(OnKeyListener onKeyListener) {
             params.mOnKeyListener = onKeyListener;
             return this;
+        }
+        
+        public AlertDialog create() {
+            // Context has already been wrapped with the appropriate theme.
+            final AlertDialog dialog = new AlertDialog (params.mContext, params.mThemeResId);
+            params.apply (dialog.mAlert);
+            dialog.setCancelable (params.mCancelable);
+            if (params.mCancelable) {
+                dialog.setCanceledOnTouchOutside (true);
+            }
+            dialog.setOnCancelListener (params.mOnCancelListener);
+            dialog.setOnDismissListener (params.mOnDismissListener);
+            if (params.mOnKeyListener != null) {
+                dialog.setOnKeyListener (params.mOnKeyListener);
+            }
+            return dialog;
+        }
+        
+        public AlertDialog show() {
+            final AlertDialog dialog = create ();
+            dialog.show ();
+            return dialog;
         }
         
     }
