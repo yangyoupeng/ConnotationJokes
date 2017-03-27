@@ -1,5 +1,9 @@
 package com.yyp.baselibrary.http;
 
+import android.content.Context;
+
+import java.util.Map;
+
 /**
  * Created by yangyoupeng on 2017/3/27.
  * <p>
@@ -7,6 +11,8 @@ package com.yyp.baselibrary.http;
  */
 
 public interface EngineCallBack {
+    //开始执行，在执行之前会回掉的方法
+    void onPreExecute(Context context, Map< String, Object > params);
     
     //    失败
     void onError(Exception e);
@@ -15,7 +21,12 @@ public interface EngineCallBack {
     void onSuccess(String result);
     
     //    默认
-    public static final EngineCallBack ENGINE_CALL_BACK = new EngineCallBack () {
+    final EngineCallBack ENGINE_CALL_BACK = new EngineCallBack () {
+        @Override
+        public void onPreExecute(Context context, Map< String, Object > params) {
+            
+        }
+        
         @Override
         public void onError(Exception e) {
             

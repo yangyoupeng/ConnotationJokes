@@ -1,5 +1,7 @@
 package com.yyp.baselibrary.http;
 
+import android.content.Context;
+
 import java.util.Map;
 
 /**
@@ -11,12 +13,13 @@ import java.util.Map;
 public class OkHttpEngine implements IHttpEngine {
     
     @Override
-    public void get(String url, Map< String, Object > params, EngineCallBack callBack) {
+    public void get(Context context, String url, Map< String, Object > params, EngineCallBack
+            callBack) {
         
     }
     
     @Override
-    public void post(String url, Map< String, Object > params, EngineCallBack callBack) {
+    public void post(Context context, String url, Map< String, Object > params, EngineCallBack callBack) {
         
     }
 }

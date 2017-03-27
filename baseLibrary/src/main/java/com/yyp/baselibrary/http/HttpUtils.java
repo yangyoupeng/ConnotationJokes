@@ -17,11 +17,13 @@ public class HttpUtils {
     //    请求的方式，默认为get类型
     private int mType = GET_TYPE;
     private static final int POST_TYPE = 0x0011;
-    private static final int GET_TYPE = 0x0011;
+    private static final int GET_TYPE = 0x0022;
     
     //    请求的参数
     private Map< String, Object > mMapParams;
     
+    //    请求头
+    private String mHeadler;
     //   默认为okHttp引擎
     private static IHttpEngine mHttpEngine = new OkHttpEngine ();
     
@@ -65,7 +67,6 @@ public class HttpUtils {
         return this;
     }
     
-    
     /**
      * 添加参数
      */
@@ -83,19 +84,31 @@ public class HttpUtils {
     }
     
     /**
+     * 添加头部
+     */
+    public HttpUtils addHeadler(String headler) {
+        this.mHeadler = headler;
+        return this;
+    }
+    
+    /**
      * 回调处理
      */
-    private void excued(EngineCallBack callBack) {
+    private void execute(EngineCallBack callBack) {
         if (callBack == null) {
             callBack = EngineCallBack.ENGINE_CALL_BACK;
         }
         
         if (mType == POST_TYPE) {
-            post (mUrl, mMapParams, callBack);
+            post (mContext, mUrl, mMapParams, callBack);
         }
         if (mType == GET_TYPE) {
-            get (mUrl, mMapParams, callBack);
+            get (mContext, mUrl, mMapParams, callBack);
         }
+    }
+    
+    public void execute() {
+        execute (null);
     }
     
     /**
@@ -105,12 +118,42 @@ public class HttpUtils {
         mHttpEngine = httpEngine;
     }
     
-    private void get(String url, Map< String, Object > params, EngineCallBack callBack) {
-        mHttpEngine.get (url, params, callBack);
+    
+    private void get(Context context, String url, Map< String, Object > params, EngineCallBack
+            callBack) {
+        mHttpEngine.get (context, url, params, callBack);
     }
     
     
-    private void post(String url, Map< String, Object > params, EngineCallBack callBack) {
-        mHttpEngine.post (url, params, callBack);
+    private void post(Context context, String url, Map< String, Object > params, EngineCallBack
+            callBack) {
+        mHttpEngine.post (context, url, params, callBack);
+    }
+    
+    /**
+     * 拼接字符串
+     */
+    public static String jointParams(String url, Map< String, Object > params) {
+        /**这个是测试，里面没有任何东西，需要时再添加 */
+        if (params == null || params.size () <= 0) {
+            return url;
+        }
+        
+        StringBuffer stringBuffer = new StringBuffer (url);
+        if (!url.contains ("?")) {
+            stringBuffer.append ("?");
+        } else {
+            if (!url.endsWith ("?")) {
+                stringBuffer.append ("&");
+            }
+        }
+        
+        for (Map.Entry< String, Object > entry : params.entrySet ()) {
+            stringBuffer.append (entry.getKey () + "=" + entry.getValue () + "&");
+        }
+        
+        stringBuffer.deleteCharAt (stringBuffer.length () - 1);
+        return stringBuffer.toString ();
+        
     }
 }
